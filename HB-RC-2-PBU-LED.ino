@@ -35,7 +35,8 @@ CRGB leds[WSNUM_LEDS];
 
 #include "RGBLEDChannel.h"
 
-#define PEERS_PER_CHANNEL 3
+#define PEERS_PER_DIM_CHANNEL 3
+#define PEERS_PER_RC_CHANNEL  8
 
 #define remISR(device,chan,pin) class device##chan##ISRHandler { \
     public: \
@@ -85,14 +86,14 @@ class RemoteList1 : public RegList1<RemoteReg1> {
       // doublePressTime(0);
     }
 };
-class RemoteChannelType : public Channel<Hal, RemoteList1, EmptyList, DefList4, PEERS_PER_CHANNEL, Ws28xxList0>, public Button {
+class RemoteChannelType : public Channel<Hal, RemoteList1, EmptyList, DefList4, PEERS_PER_RC_CHANNEL, Ws28xxList0>, public Button {
   private:
     uint8_t       repeatcnt;
 
   public:
-    typedef Channel<Hal, RemoteList1, EmptyList, DefList4, PEERS_PER_CHANNEL, Ws28xxList0> BaseChannel;
+    typedef Channel<Hal, RemoteList1, EmptyList, DefList4, PEERS_PER_RC_CHANNEL, Ws28xxList0> BaseChannel;
 
-    RemoteChannelType () : BaseChannel() {}
+    RemoteChannelType () : BaseChannel(), repeatcnt(0) {}
     virtual ~RemoteChannelType () {}
 
     Button& button () {
@@ -132,7 +133,7 @@ class RemoteChannelType : public Channel<Hal, RemoteList1, EmptyList, DefList4, 
 };
 
 
-typedef RGBLEDChannel<Hal, PEERS_PER_CHANNEL, Ws28xxList0> RGBLEDChannelType;
+typedef RGBLEDChannel<Hal, PEERS_PER_DIM_CHANNEL, Ws28xxList0> RGBLEDChannelType;
 
 class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, Ws28xxList0>, 6, Ws28xxList0> {
   public:
