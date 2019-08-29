@@ -6,6 +6,11 @@
 - CC1101 868MHz
 - WS2811 LEDs
 
-_erstmal nur softwareseitig; Prototyp folgt_
-
 <img src="Images/WebUI_Bedienung.jpg" width=600>
+
+<img src="Images/Test_Wippe.jpg" width=600>
+
+<img src="Images/Testaufbau_Vorn.jpg" width=600>
+
+<img src="Images/Testaufbau_Hinten.jpg" width=600>
+
