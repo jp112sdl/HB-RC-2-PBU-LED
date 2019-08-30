@@ -14,18 +14,23 @@
 #include <Register.h>
 #include <MultiChannelDevice.h>
 #include <FastLED.h>
+#include <Remote.h>
+#include <Switch.h>
 
-#define WSNUM_LEDS    4          //Anzahl angeschlossener LEDs
-#define WSLED_PIN     7          //GPIO Pin LED Anschluss
-#define WSLED_TYPE    WS2812B    //LED Typ
-#define WSCOLOR_ORDER GRB        //Farbreihenfolge
-
+//Pin Definitionen
 #define CONFIG_BUTTON_PIN 8
-#define ONBOARD_LED_PIN   4
+#define WSLED_PIN         9      //GPIO Pin LED Anschluss
+#define ONBOARD_LED_PIN1  A2
+#define ONBOARD_LED_PIN2  A1
 #define CC1101_CS         10
 #define CC1101_GDO0       2
-#define BTN1_PIN          9
+#define BTN1_PIN          5
 #define BTN2_PIN          6
+
+//Einstellungen für die RGB LEDs
+#define WSNUM_LEDS    4          //Anzahl angeschlossener LEDs
+#define WSLED_TYPE    WS2812B    //LED Typ
+#define WSCOLOR_ORDER GRB        //Farbreihenfolge
 
 uint8_t dim1level(0);
 uint8_t dim2level(0);
@@ -35,22 +40,11 @@ CRGB leds[WSNUM_LEDS];
 
 #include "RGBLEDChannel.h"
 
-#define PEERS_PER_DIM_CHANNEL 3
-#define PEERS_PER_RC_CHANNEL  8
-
-#define remISR(device,chan,pin) class device##chan##ISRHandler { \
-    public: \
-      static void isr () { device.remoteChannel(chan).irq(); } \
-  }; \
-  device.remoteChannel(chan).button().init(pin); \
-  if( digitalPinToInterrupt(pin) == NOT_AN_INTERRUPT ) \
-    enableInterrupt(pin,device##chan##ISRHandler::isr,CHANGE); \
-  else \
-    attachInterrupt(digitalPinToInterrupt(pin),device##chan##ISRHandler::isr,CHANGE);
+#define PEERS_PER_RGB_CHANNEL  8
+#define PEERS_PER_RC_CHANNEL   12
 
 using namespace as;
 
-// define all device properties
 const struct DeviceInfo PROGMEM devinfo = {
   {0xF3, 0x30, 0x00},     // Device ID
   "JPRC2LED01",           // Device Serial
@@ -60,87 +54,18 @@ const struct DeviceInfo PROGMEM devinfo = {
   {0x01, 0x00}            // Info Bytes
 };
 
-/**
-   Configure the used hardware
-*/
-typedef AskSin<StatusLed<ONBOARD_LED_PIN>, NoBattery, Radio<LibSPI<CC1101_CS>, CC1101_GDO0>> Hal;
+typedef AskSin<DualStatusLed<ONBOARD_LED_PIN1, ONBOARD_LED_PIN2>, NoBattery, Radio<LibSPI<CC1101_CS>, CC1101_GDO0>> Hal;
 Hal hal;
 
-DEFREGISTER(Ws28xxReg0, MASTERID_REGS)
-class Ws28xxList0 : public RegList0<Ws28xxReg0> {
+typedef RemoteChannel<Hal, PEERS_PER_RC_CHANNEL, List0> RemoteChannelType;
+typedef RGBLEDChannel<Hal, PEERS_PER_RGB_CHANNEL,List0> RGBLEDChannelType;
+
+class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, List0>, 6, List0> {
   public:
-    Ws28xxList0(uint16_t addr) : RegList0<Ws28xxReg0>(addr) {}
-    void defaults () {
-      clear();
-    }
-};
-
-DEFREGISTER(RemoteReg1, CREG_LONGPRESSTIME, CREG_AES_ACTIVE, CREG_DOUBLEPRESSTIME)
-class RemoteList1 : public RegList1<RemoteReg1> {
+    VirtChannel<Hal, RemoteChannelType , List0> c1, c2;
+    VirtChannel<Hal, RGBLEDChannelType , List0> c3, c4, c5, c6;
   public:
-    RemoteList1 (uint16_t addr) : RegList1<RemoteReg1>(addr) {}
-    void defaults () {
-      clear();
-      longPressTime(1);
-      // aesActive(false);
-      // doublePressTime(0);
-    }
-};
-class RemoteChannelType : public Channel<Hal, RemoteList1, EmptyList, DefList4, PEERS_PER_RC_CHANNEL, Ws28xxList0>, public Button {
-  private:
-    uint8_t       repeatcnt;
-
-  public:
-    typedef Channel<Hal, RemoteList1, EmptyList, DefList4, PEERS_PER_RC_CHANNEL, Ws28xxList0> BaseChannel;
-
-    RemoteChannelType () : BaseChannel(), repeatcnt(0) {}
-    virtual ~RemoteChannelType () {}
-
-    Button& button () {
-      return *(Button*)this;
-    }
-
-    uint8_t status () const {
-      return 0;
-    }
-
-    uint8_t flags () const {
-      return 0;
-    }
-
-    virtual void state(uint8_t s) {
-      DHEX(BaseChannel::number());
-      Button::state(s);
-      RemoteEventMsg& msg = (RemoteEventMsg&)this->device().message();
-      msg.init(this->device().nextcount(), this->number(), repeatcnt, (s == longreleased || s == longpressed), false);
-      if ( s == released || s == longreleased) {
-        this->device().sendPeerEvent(msg, *this);
-        repeatcnt++;
-      }
-      else if (s == longpressed) {
-        this->device().broadcastPeerEvent(msg, *this);
-      }
-    }
-
-    uint8_t state() const {
-      return Button::state();
-    }
-
-    bool pressed () const {
-      uint8_t s = state();
-      return s == Button::pressed || s == Button::debounce || s == Button::longpressed;
-    }
-};
-
-
-typedef RGBLEDChannel<Hal, PEERS_PER_DIM_CHANNEL, Ws28xxList0> RGBLEDChannelType;
-
-class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, Ws28xxList0>, 6, Ws28xxList0> {
-  public:
-    VirtChannel<Hal, RemoteChannelType , Ws28xxList0> c1, c2;
-    VirtChannel<Hal, RGBLEDChannelType , Ws28xxList0> c3, c4, c5, c6;
-  public:
-    typedef ChannelDevice<Hal, VirtBaseChannel<Hal, Ws28xxList0>, 6, Ws28xxList0> DeviceType;
+    typedef ChannelDevice<Hal, VirtBaseChannel<Hal, List0>, 6, List0> DeviceType;
     RCLEDDevice (const DeviceInfo& info, uint16_t addr) : DeviceType(info, addr) {
       DeviceType::registerChannel(c1, 1);
       DeviceType::registerChannel(c2, 2);
@@ -151,7 +76,7 @@ class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, Ws28xxList0>,
     }
     virtual ~RCLEDDevice () {}
 
-    RemoteChannelType& remoteChannel (uint8_t num)  {
+    RemoteChannelType& channel (uint8_t num)  {
       switch (num) {
         case 1:
           return c1;
@@ -210,14 +135,15 @@ class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, Ws28xxList0>,
       FastLED.show();
     }
 };
+
 RCLEDDevice sdev(devinfo, 0x20);
 ConfigButton<RCLEDDevice> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
   sdev.init(hal);
-  remISR(sdev, 1, BTN1_PIN);
-  remISR(sdev, 2, BTN2_PIN);
+  remoteISR(sdev, 1, BTN1_PIN);
+  remoteISR(sdev, 2, BTN1_PIN);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
 }
