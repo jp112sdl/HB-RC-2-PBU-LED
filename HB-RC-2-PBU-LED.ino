@@ -28,7 +28,7 @@
 #define BTN2_PIN          6
 
 //Einstellungen für die RGB LEDs
-#define WSNUM_LEDS    4          //Anzahl angeschlossener LEDs
+#define WSNUM_LEDS    16          //Anzahl angeschlossener LEDs
 #define WSLED_TYPE    WS2812B    //LED Typ
 #define WSCOLOR_ORDER GRB        //Farbreihenfolge
 
