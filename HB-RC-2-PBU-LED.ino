@@ -40,7 +40,7 @@ CRGB leds[WSNUM_LEDS];
 
 #include "RGBLEDChannel.h"
 
-#define PEERS_PER_RGB_CHANNEL  8
+#define PEERS_PER_RGB_CHANNEL  3
 #define PEERS_PER_RC_CHANNEL   12
 
 using namespace as;
