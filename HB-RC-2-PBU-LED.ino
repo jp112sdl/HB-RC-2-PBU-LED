@@ -76,30 +76,12 @@ class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, List0>, 6, Li
     }
     virtual ~RCLEDDevice () {}
 
-    RemoteChannelType& channel (uint8_t num)  {
-      switch (num) {
-        case 1:
-          return c1;
-          break;
-        case 2:
-          return c2;
-          break;
-      }
-      return c1;
-    }
-
-    RGBLEDChannelType& Dim1Channel ()  {
-      return c3;
-    }
-    RGBLEDChannelType& Col1Channel ()  {
-      return c4;
-    }
-    RGBLEDChannelType& Dim2Channel ()  {
-      return c5;
-    }
-    RGBLEDChannelType& Col2Channel ()  {
-      return c6;
-    }
+    RemoteChannelType& Rem1Channel ()  { return c1; }
+    RemoteChannelType& Rem2Channel ()  { return c2; }
+    RGBLEDChannelType& Dim1Channel ()  { return c3; }
+    RGBLEDChannelType& Col1Channel ()  { return c4; }
+    RGBLEDChannelType& Dim2Channel ()  { return c5; }
+    RGBLEDChannelType& Col2Channel ()  { return c6; }
 
     virtual void configChanged () {
       DeviceType::configChanged();
@@ -142,8 +124,8 @@ ConfigButton<RCLEDDevice> cfgBtn(sdev);
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
   sdev.init(hal);
-  remoteISR(sdev, 1, BTN1_PIN);
-  remoteISR(sdev, 2, BTN2_PIN);
+  remoteChannelISR(sdev.Rem1Channel(), BTN1_PIN);
+  remoteChannelISR(sdev.Rem2Channel(), BTN2_PIN);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
 }
