@@ -5,14 +5,14 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
-Date ""
-Rev ""
+Title "HB-RC-2-PBU-LED"
+Date "2019-09"
+Rev "1.1"
 Comp ""
 Comment1 ""
 Comment2 ""
 Comment3 ""
-Comment4 ""
+Comment4 "Wandtaster mit RGB LED Hintergrundbeleuchtung"
 $EndDescr
 $Comp
 L hb-rc-2-pbu-led-rescue:CC1101-CC1101 IC1
