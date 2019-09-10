@@ -26,8 +26,6 @@
 
 <img src="Images/WebUI_Bedienung.jpg" width=600>
 
-<img src="Images/Wippe.jpg" width=600>
+<img src="Images/Wippe.jpg" width=400> <img src="Images/Wippe_im_Rahmen.jpg" width=400>
 
-<img src="Images/Wippe_im_Rahmen.jpg" width=600>
-
-<img src="Images/Grundplatte.jpg" width=600>
+<img src="Images/Grundplatte.jpg" width=400> <img src="Images/Grundplatte_mit_LED.jpg" width=400>
