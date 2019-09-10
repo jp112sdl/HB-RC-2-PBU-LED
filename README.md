@@ -18,6 +18,10 @@
 1 | SW1, SW2, SW3 | Taster | [Tastersortiment](https://www.aliexpress.com/item/32811153729.html)
 2 | |WS2812B LED Streifen | [DEBO LED NP8 2](https://www.reichelt.de/entwicklerboards-neopixel-stick-mit-8-ws2812-5050-rgb-leds-debo-led-np8-2-p240688.html)
 
+### PCB
+
+<img src="PCB/hb-rc-2-pbu-led.png" width=600>
+
 ### ein paar Bilder
 
 <img src="Images/WebUI_Bedienung.jpg" width=600>
