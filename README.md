@@ -16,7 +16,7 @@
 1 | U3 | LevelShifter | [SN74LVC1T45DBVR](https://www.aliexpress.com/item/32963167201.html)
 1 | IC1 | 868MHz Funkmodul | [CC1101](https://www.aliexpress.com/item/32924239954.html)
 1 | SW1, SW2, SW3 | Taster | [Tastersortiment](https://www.aliexpress.com/item/32811153729.html)
-1 | |WS2812B LED Streifen | [DEBO LED NP8 2](https://www.reichelt.de/entwicklerboards-neopixel-stick-mit-8-ws2812-5050-rgb-leds-debo-led-np8-2-p240688.html)
+2 | |WS2812B LED Streifen | [DEBO LED NP8 2](https://www.reichelt.de/entwicklerboards-neopixel-stick-mit-8-ws2812-5050-rgb-leds-debo-led-np8-2-p240688.html)
 
 <img src="Images/WebUI_Bedienung.jpg" width=600>
 
