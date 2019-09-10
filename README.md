@@ -1,6 +1,6 @@
 # HB-RC-2-PBU-LED
 
-**2 fach Wandtaster, ähnlich dem [HmIP-BSL](https://www.elv.de/elv-homematic-ip-schaltaktor-fuer-markenschalter-mit-signalleuchte-hmip-bsl.html), mit RGB LED Beleuchtung (je 2 LED pro Schaltwippenhälfte (oben/unten)).**
+**2 fach Wandtaster, ähnlich dem [HmIP-BSL](https://www.elv.de/elv-homematic-ip-schaltaktor-fuer-markenschalter-mit-signalleuchte-hmip-bsl.html), mit RGB LED Beleuchtung (oben/unten)).**
 
 ### Bauteile
 | Anzahl | Ref | Typ | Bezeichnung |
@@ -18,4 +18,12 @@
 1 | SW1, SW2, SW3 | Taster | [Tastersortiment](https://www.aliexpress.com/item/32811153729.html)
 2 | |WS2812B LED Streifen | [DEBO LED NP8 2](https://www.reichelt.de/entwicklerboards-neopixel-stick-mit-8-ws2812-5050-rgb-leds-debo-led-np8-2-p240688.html)
 
+### ein paar Bilder
+
 <img src="Images/WebUI_Bedienung.jpg" width=600>
+
+<img src="Images/Wippe.jpg" width=600>
+
+<img src="Images/Wippe_im_Rahmen.jpg" width=600>
+
+<img src="Images/Grundplatte.jpg" width=600>
