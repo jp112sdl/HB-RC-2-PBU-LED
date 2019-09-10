@@ -19,10 +19,3 @@
 2 | |WS2812B LED Streifen | [DEBO LED NP8 2](https://www.reichelt.de/entwicklerboards-neopixel-stick-mit-8-ws2812-5050-rgb-leds-debo-led-np8-2-p240688.html)
 
 <img src="Images/WebUI_Bedienung.jpg" width=600>
-
-<img src="Images/Test_Wippe.jpg" width=600>
-
-<img src="Images/Testaufbau_Vorn.jpg" width=600>
-
-<img src="Images/Testaufbau_Hinten.jpg" width=600>
-
