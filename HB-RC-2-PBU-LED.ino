@@ -20,12 +20,12 @@
 //Pin Definitionen
 #define CONFIG_BUTTON_PIN 8
 #define WSLED_PIN         9      //GPIO Pin LED Anschluss
-#define ONBOARD_LED_PIN1  A2
-#define ONBOARD_LED_PIN2  A1
+#define ONBOARD_LED_PIN1  14
+#define ONBOARD_LED_PIN2  15
 #define CC1101_CS         10
 #define CC1101_GDO0       2
-#define BTN1_PIN          5
-#define BTN2_PIN          6
+#define BTN1_PIN          16
+#define BTN2_PIN          17
 
 //Einstellungen für die RGB LEDs
 #define WSNUM_LEDS    16          //Anzahl angeschlossener LEDs
