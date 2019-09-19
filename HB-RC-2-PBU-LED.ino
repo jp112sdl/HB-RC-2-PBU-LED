@@ -15,7 +15,7 @@
 #include <MultiChannelDevice.h>
 #include <FastLED.h>
 #include <Remote.h>
-#include <Switch.h>
+#include <Dimmer.h>
 
 //Pin Definitionen
 #define CONFIG_BUTTON_PIN 8
@@ -38,7 +38,6 @@ uint8_t col1val(0);
 uint8_t col2val(0);
 CRGB leds[WSNUM_LEDS];
 
-#include "RGBLEDChannel.h"
 
 #define PEERS_PER_RGB_CHANNEL  3
 #define PEERS_PER_RC_CHANNEL   12
@@ -58,74 +57,58 @@ typedef AskSin<DualStatusLed<ONBOARD_LED_PIN1, ONBOARD_LED_PIN2>, NoBattery, Rad
 Hal hal;
 
 typedef RemoteChannel<Hal, PEERS_PER_RC_CHANNEL, List0> RemoteChannelType;
-typedef RGBLEDChannel<Hal, PEERS_PER_RGB_CHANNEL,List0> RGBLEDChannelType;
+typedef DimmerChannel<Hal, PEERS_PER_RGB_CHANNEL,List0> RGBLEDChannelType;
+typedef DimmerAndRemoteDevice<Hal, RGBLEDChannelType, RemoteChannelType, 4, 1, 2, List0> RCLEDDevice;
 
-class RCLEDDevice : public ChannelDevice<Hal, VirtBaseChannel<Hal, List0>, 6, List0> {
-  public:
-    VirtChannel<Hal, RemoteChannelType , List0> c1, c2;
-    VirtChannel<Hal, RGBLEDChannelType , List0> c3, c4, c5, c6;
-  public:
-    typedef ChannelDevice<Hal, VirtBaseChannel<Hal, List0>, 6, List0> DeviceType;
-    RCLEDDevice (const DeviceInfo& info, uint16_t addr) : DeviceType(info, addr) {
-      DeviceType::registerChannel(c1, 1);
-      DeviceType::registerChannel(c2, 2);
-      DeviceType::registerChannel(c3, 3);
-      DeviceType::registerChannel(c4, 4);
-      DeviceType::registerChannel(c5, 5);
-      DeviceType::registerChannel(c6, 6);
+// we need no PWM class
+class DummyPWM {
+public:
+  void init(uint8_t __attribute__ ((unused)) pwm) {}
+  void set(uint8_t __attribute__ ((unused)) pwm) {}
+};
+
+template<class HalType,class DimmerType,class PWM>
+class RGBControl : public DimmerControl<HalType,DimmerType,PWM> {
+public:
+  typedef DimmerControl<HalType,DimmerType,PWM> BaseControl;
+  RGBControl (DimmerType& dim) : BaseControl(dim) {
+    for (int i = 0; i < WSNUM_LEDS; i++) {
+      leds[i] = CRGB::Black;
     }
-    virtual ~RCLEDDevice () {}
+    FastLED.addLeds<WSLED_TYPE, WSLED_PIN, WSCOLOR_ORDER>(leds, WSNUM_LEDS);
+    FastLED.setBrightness(255);
+  }
 
-    RemoteChannelType& Rem1Channel ()  { return c1; }
-    RemoteChannelType& Rem2Channel ()  { return c2; }
-    RGBLEDChannelType& Dim1Channel ()  { return c3; }
-    RGBLEDChannelType& Col1Channel ()  { return c4; }
-    RGBLEDChannelType& Dim2Channel ()  { return c5; }
-    RGBLEDChannelType& Col2Channel ()  { return c6; }
+  virtual ~RGBControl () {}
 
-    virtual void configChanged () {
-      DeviceType::configChanged();
-      for (int i = 0; i < WSNUM_LEDS; i++) {
-        leds[i] = CRGB::Black;
+  virtual void updatePhysical () {
+    // first calculate all physical values of the dimmer channels
+    BaseControl::updatePhysical();
+    // set brightness and color to LEDs
+    uint8_t ledprocombi = WSNUM_LEDS / this->physicalCount() * 2;
+    uint8_t ledidx = 0;
+    for( uint8_t i=0; i<this->physicalCount();  ) {
+      uint8_t dimlevel = this->physical[i++];
+      uint8_t collevel = this->physical[i++];
+      CRGB ledvalue = CHSV((collevel * 1275L) / 1000, (collevel <  200) ? 255 : 0, dimlevel);
+      // set to real LEDs
+      for( uint8_t y=0; y<ledprocombi; ++y) {
+        leds[ledidx++] = ledvalue;
       }
-      FastLED.addLeds<WSLED_TYPE, WSLED_PIN, WSCOLOR_ORDER>(leds, WSNUM_LEDS);
-      FastLED.setBrightness(255);
     }
-
-    void init (Hal& hal) {
-      DeviceType::init(hal);
-
-      Dim1Channel().setLevel(0, 0, 0xffff);
-      Dim2Channel().setLevel(0, 0, 0xffff);
-      Col1Channel().setColor(0);
-      Col2Channel().setColor(0);
-
-      Dim1Channel().changed(true);
-      Dim2Channel().changed(true);
-      Col1Channel().changed(true);
-      Col2Channel().changed(true);
-    }
-
-    void updateLedValues() {
-      uint8_t ledsHalf = WSNUM_LEDS / 2;
-      for (uint8_t i = 0; i < WSNUM_LEDS; i++) {
-        if (i < ledsHalf)
-          leds[i] = CHSV((col1val * 1275L) / 1000, (col1val <  200) ? 255 : 0, dim1level);
-        else
-          leds[i] = CHSV((col2val * 1275L) / 1000, (col2val <  200) ? 255 : 0, dim2level);
-      }
-      FastLED.show();
-    }
+    FastLED.show();
+  }
 };
 
 RCLEDDevice sdev(devinfo, 0x20);
+RGBControl<Hal,RCLEDDevice,DummyPWM> control(sdev);
 ConfigButton<RCLEDDevice> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
-  sdev.init(hal);
-  remoteChannelISR(sdev.Rem1Channel(), BTN1_PIN);
-  remoteChannelISR(sdev.Rem2Channel(), BTN2_PIN);
+  control.init(hal,0,0,0,0); // all 4 PWM pins are 0
+  remoteChannelISR(sdev.remoteChannel(1), BTN1_PIN);
+  remoteChannelISR(sdev.remoteChannel(2), BTN2_PIN);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
   sdev.initDone();
 }
@@ -136,5 +119,5 @@ void loop() {
   if ( worked == false && poll == false ) {
     hal.activity.savePower<Idle<true>>(hal);
   }
-  sdev.updateLedValues();
 }
+
