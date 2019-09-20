@@ -7,11 +7,11 @@ encoding utf-8
 Sheet 1 1
 Title "HB-RC-2-PBU-LED"
 Date "2019-09"
-Rev "1.1"
+Rev "2.0"
 Comp ""
 Comment1 ""
 Comment2 ""
-Comment3 ""
+Comment3 "Variante ATmega 644(A)"
 Comment4 "Wandtaster mit RGB LED Hintergrundbeleuchtung"
 $EndDescr
 $Comp
