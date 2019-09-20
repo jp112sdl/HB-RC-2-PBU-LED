@@ -85,7 +85,7 @@ public:
     // first calculate all physical values of the dimmer channels
     BaseControl::updatePhysical();
     // set brightness and color to LEDs
-    uint8_t ledprocombi = WSNUM_LEDS / this->physicalCount() * 2;
+    uint8_t ledprocombi = WSNUM_LEDS / (this->physicalCount() / 2);
     uint8_t ledidx = 0;
     for( uint8_t i=0; i<this->physicalCount();  ) {
       uint8_t dimlevel = this->physical[i++];
@@ -106,7 +106,8 @@ ConfigButton<RCLEDDevice> cfgBtn(sdev);
 
 void setup () {
   DINIT(57600, ASKSIN_PLUS_PLUS_IDENTIFIER);
-  control.init(hal,0,0,0,0); // all 4 PWM pins are 0
+  uint8_t pins[4] = {0,0,0,0}; // all 4 PWM pins are 0
+  control.init(hal,pins);
   remoteChannelISR(sdev.remoteChannel(1), BTN1_PIN);
   remoteChannelISR(sdev.remoteChannel(2), BTN2_PIN);
   buttonISR(cfgBtn, CONFIG_BUTTON_PIN);
