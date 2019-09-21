@@ -2,6 +2,8 @@
 
 **2 fach Wandtaster, ähnlich dem [HmIP-BSL](https://www.elv.de/elv-homematic-ip-schaltaktor-fuer-markenschalter-mit-signalleuchte-hmip-bsl.html), mit RGB LED Beleuchtung (oben/unten)).**
 
+Thread im Homematic Forum: https://homematic-forum.de/forum/viewtopic.php?f=76&t=53254
+
 ### Bauteile
 | Anzahl | Ref | Typ | Bezeichnung |
 |----|----|----|----|
