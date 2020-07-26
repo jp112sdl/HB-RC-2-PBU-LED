@@ -17,7 +17,9 @@
 #include <Remote.h>
 #include <Dimmer.h>
 
-//Pin Definitionen
+//Pin Definitionen (when using 644P(A): use Standard Pinout)
+
+#ifdef __AVR_ATmega328P__
 #define CONFIG_BUTTON_PIN 8
 #define WSLED_PIN         9      //GPIO Pin LED Anschluss
 #define ONBOARD_LED_PIN1  14
@@ -26,6 +28,19 @@
 #define CC1101_GDO0       2
 #define BTN1_PIN          16
 #define BTN2_PIN          17
+#endif
+
+#ifdef __AVR_ATmega644P__
+#define CONFIG_BUTTON_PIN 1       //PB1
+#define WSLED_PIN         13      //PD5 GPIO Pin LED Anschluss
+#define ONBOARD_LED_PIN1  25      //PA1
+#define ONBOARD_LED_PIN2  24      //PA0
+#define CC1101_CS         4       //PB4
+#define CC1101_GDO0       10      //PD2
+#define BTN1_PIN          19      //PC3
+#define BTN2_PIN          20      //PC4
+#endif
+
 
 //Einstellungen für die RGB LEDs
 #define WSNUM_LEDS    16          //Anzahl angeschlossener LEDs
