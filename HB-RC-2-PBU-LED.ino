@@ -81,6 +81,7 @@ class DummyPWM {
 public:
   void init(uint8_t __attribute__ ((unused)) pwm) {}
   void set(uint8_t __attribute__ ((unused)) pwm) {}
+  void param(uint8_t __attribute__ ((unused)) speedMultiplier, uint8_t __attribute__ ((unused)) characteristic);
 };
 
 template<class HalType,class DimmerType,class PWM>
