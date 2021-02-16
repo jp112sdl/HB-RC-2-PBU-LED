@@ -72,16 +72,16 @@ const struct DeviceInfo PROGMEM devinfo = {
 typedef AskSin<DualStatusLed<ONBOARD_LED_PIN1, ONBOARD_LED_PIN2>, NoBattery, Radio<LibSPI<CC1101_CS>, CC1101_GDO0>> Hal;
 Hal hal;
 
-typedef RemoteChannel<Hal, PEERS_PER_RC_CHANNEL, List0> RemoteChannelType;
-typedef DimmerChannel<Hal, PEERS_PER_RGB_CHANNEL,List0> RGBLEDChannelType;
-typedef DimmerAndRemoteDevice<Hal, RGBLEDChannelType, RemoteChannelType, 4, 1, 2, List0> RCLEDDevice;
+typedef RemoteChannel<Hal, PEERS_PER_RC_CHANNEL, DimmerList0> RemoteChannelType;
+typedef DimmerChannel<Hal, PEERS_PER_RGB_CHANNEL,DimmerList0> RGBLEDChannelType;
+typedef DimmerAndRemoteDevice<Hal, RGBLEDChannelType, RemoteChannelType, 4, 1, 2, DimmerList0> RCLEDDevice;
 
 // we need no PWM class
 class DummyPWM {
 public:
   void init(uint8_t __attribute__ ((unused)) pwm) {}
   void set(uint8_t __attribute__ ((unused)) pwm) {}
-  void param(uint8_t __attribute__ ((unused)) speedMultiplier, uint8_t __attribute__ ((unused)) characteristic);
+  void param(uint8_t __attribute__ ((unused)) speedMultiplier, uint8_t __attribute__ ((unused)) characteristic) {}
 };
 
 template<class HalType,class DimmerType,class PWM>
